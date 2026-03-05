@@ -4,8 +4,11 @@ import {
   Columns3,
   FolderOpen,
   Activity,
+  BarChart3,
   Wifi,
   WifiOff,
+  Github,
+  Globe,
 } from "lucide-react";
 
 const NAV_ITEMS = [
@@ -13,6 +16,7 @@ const NAV_ITEMS = [
   { to: "/kanban", icon: Columns3, label: "Agent Board" },
   { to: "/sessions", icon: FolderOpen, label: "Sessions" },
   { to: "/activity", icon: Activity, label: "Activity Feed" },
+  { to: "/analytics", icon: BarChart3, label: "Analytics" },
 ] as const;
 
 interface SidebarProps {
@@ -28,9 +32,7 @@ export function Sidebar({ wsConnected }: SidebarProps) {
             <Activity className="w-4 h-4 text-accent" />
           </div>
           <div>
-            <h1 className="text-sm font-semibold text-gray-100">
-              Agent Dashboard
-            </h1>
+            <h1 className="text-sm font-semibold text-gray-100">Agent Dashboard</h1>
             <p className="text-[11px] text-gray-500">Claude Code Monitor</p>
           </div>
         </div>
@@ -56,7 +58,7 @@ export function Sidebar({ wsConnected }: SidebarProps) {
         ))}
       </nav>
 
-      <div className="px-5 py-4 border-t border-border">
+      <div className="px-5 py-4 border-t border-border space-y-3">
         <div className="flex items-center gap-2 text-xs">
           {wsConnected ? (
             <>
@@ -70,6 +72,27 @@ export function Sidebar({ wsConnected }: SidebarProps) {
             </>
           )}
           <span className="ml-auto text-gray-600">v1.0.0</span>
+        </div>
+        <div className="flex items-center gap-3">
+          <a
+            href="https://github.com/hoangsonww"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-gray-500 hover:text-gray-300 transition-colors"
+            title="GitHub"
+          >
+            <Github className="w-3.5 h-3.5" />
+          </a>
+          <a
+            href="https://sonnguyenhoang.com"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-gray-500 hover:text-gray-300 transition-colors flex items-center gap-1 text-[11px]"
+            title="sonnguyenhoang.com"
+          >
+            <Globe className="w-3.5 h-3.5" />
+            <span>sonnguyenhoang.com</span>
+          </a>
         </div>
       </div>
     </aside>

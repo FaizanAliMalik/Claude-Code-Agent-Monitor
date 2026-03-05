@@ -31,7 +31,8 @@ router.get("/:id", (req, res) => {
 });
 
 router.post("/", (req, res) => {
-  const { id, session_id, name, type, subagent_type, status, task, parent_agent_id, metadata } = req.body;
+  const { id, session_id, name, type, subagent_type, status, task, parent_agent_id, metadata } =
+    req.body;
   if (!id || !session_id || !name) {
     return res.status(400).json({
       error: { code: "INVALID_INPUT", message: "id, session_id, and name are required" },

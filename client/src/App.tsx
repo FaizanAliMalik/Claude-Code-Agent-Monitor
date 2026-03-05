@@ -6,6 +6,7 @@ import { KanbanBoard } from "./pages/KanbanBoard";
 import { Sessions } from "./pages/Sessions";
 import { SessionDetail } from "./pages/SessionDetail";
 import { ActivityFeed } from "./pages/ActivityFeed";
+import { Analytics } from "./pages/Analytics";
 import { useWebSocket } from "./hooks/useWebSocket";
 import { eventBus } from "./lib/eventBus";
 import type { WSMessage } from "./lib/types";
@@ -26,6 +27,7 @@ export default function App() {
           <Route path="sessions" element={<Sessions />} />
           <Route path="sessions/:id" element={<SessionDetail />} />
           <Route path="activity" element={<ActivityFeed />} />
+          <Route path="analytics" element={<Analytics />} />
         </Route>
       </Routes>
     </BrowserRouter>

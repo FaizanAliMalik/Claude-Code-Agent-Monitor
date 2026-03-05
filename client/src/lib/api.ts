@@ -1,4 +1,4 @@
-import type { Agent, DashboardEvent, Session, Stats } from "./types";
+import type { Agent, Analytics, DashboardEvent, Session, Stats } from "./types";
 
 const BASE = "/api";
 
@@ -55,5 +55,9 @@ export const api = {
       const q = qs.toString();
       return request<{ events: DashboardEvent[] }>(`/events${q ? `?${q}` : ""}`);
     },
+  },
+
+  analytics: {
+    get: () => request<Analytics>("/analytics"),
   },
 };

@@ -5,7 +5,7 @@ const { broadcast } = require("../websocket");
 const router = Router();
 
 router.get("/", (req, res) => {
-  const limit = Math.min(parseInt(req.query.limit) || 50, 200);
+  const limit = Math.min(parseInt(req.query.limit) || 50, 1000);
   const offset = parseInt(req.query.offset) || 0;
   const status = req.query.status;
 
@@ -37,7 +37,14 @@ router.post("/", (req, res) => {
     return res.json({ session: existing, created: false });
   }
 
-  stmts.insertSession.run(id, name || null, "active", cwd || null, model || null, metadata ? JSON.stringify(metadata) : null);
+  stmts.insertSession.run(
+    id,
+    name || null,
+    "active",
+    cwd || null,
+    model || null,
+    metadata ? JSON.stringify(metadata) : null
+  );
   const session = stmts.getSession.get(id);
   broadcast("session_created", session);
   res.status(201).json({ session, created: true });

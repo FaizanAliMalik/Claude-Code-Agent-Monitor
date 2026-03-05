@@ -1,4 +1,5 @@
 import { Bot, GitBranch, Clock, Wrench } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 import { AgentStatusBadge } from "./StatusBadge";
 import type { Agent } from "../lib/types";
 import { formatDuration, formatTime } from "../lib/format";
@@ -9,11 +10,20 @@ interface AgentCardProps {
 }
 
 export function AgentCard({ agent, onClick }: AgentCardProps) {
+  const navigate = useNavigate();
   const isActive = agent.status === "working" || agent.status === "connected";
+
+  function handleClick() {
+    if (onClick) {
+      onClick();
+    } else {
+      navigate(`/sessions/${agent.session_id}`);
+    }
+  }
 
   return (
     <div
-      onClick={onClick}
+      onClick={handleClick}
       className={`card-hover p-4 cursor-pointer animate-fade-in ${
         isActive ? "border-l-2 border-l-emerald-500/50" : ""
       }`}
@@ -34,13 +44,9 @@ export function AgentCard({ agent, onClick }: AgentCardProps) {
             )}
           </div>
           <div className="min-w-0">
-            <p className="text-sm font-medium text-gray-200 truncate">
-              {agent.name}
-            </p>
+            <p className="text-sm font-medium text-gray-200 truncate">{agent.name}</p>
             {agent.subagent_type && (
-              <p className="text-[11px] text-gray-500 truncate">
-                {agent.subagent_type}
-              </p>
+              <p className="text-[11px] text-gray-500 truncate">{agent.subagent_type}</p>
             )}
           </div>
         </div>
@@ -48,9 +54,7 @@ export function AgentCard({ agent, onClick }: AgentCardProps) {
       </div>
 
       {agent.task && (
-        <p className="text-xs text-gray-400 mb-3 line-clamp-2 leading-relaxed">
-          {agent.task}
-        </p>
+        <p className="text-xs text-gray-400 mb-3 line-clamp-2 leading-relaxed">{agent.task}</p>
       )}
 
       <div className="flex items-center gap-4 text-[11px] text-gray-500">
@@ -66,6 +70,7 @@ export function AgentCard({ agent, onClick }: AgentCardProps) {
             ? formatDuration(agent.started_at, agent.ended_at)
             : formatTime(agent.started_at)}
         </span>
+        <span className="ml-auto font-mono opacity-50">{agent.session_id.slice(0, 8)}</span>
       </div>
     </div>
   );

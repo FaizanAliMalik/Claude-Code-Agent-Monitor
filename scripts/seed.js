@@ -132,10 +132,7 @@ function seed() {
       "claude-opus-4-6",
       null
     );
-    db.prepare("UPDATE sessions SET ended_at = ? WHERE id = ?").run(
-      minutesAgo(45),
-      errSessionId
-    );
+    db.prepare("UPDATE sessions SET ended_at = ? WHERE id = ?").run(minutesAgo(45), errSessionId);
     sessions.push(errSessionId);
 
     // Create agents for active session 1
@@ -208,17 +205,7 @@ function seed() {
     // Completed agents for other sessions
     for (const sid of sessions.slice(2)) {
       const mainId = `${sid}-main`;
-      stmts.insertAgent.run(
-        mainId,
-        sid,
-        "Main Agent",
-        "main",
-        null,
-        "completed",
-        null,
-        null,
-        null
-      );
+      stmts.insertAgent.run(mainId, sid, "Main Agent", "main", null, "completed", null, null, null);
       db.prepare("UPDATE agents SET ended_at = ? WHERE id = ?").run(
         minutesAgo(Math.floor(Math.random() * 60)),
         mainId
@@ -274,7 +261,7 @@ function seed() {
           eventType,
           eventType.includes("Tool") ? tool : null,
           summary,
-          JSON.stringify({ tool_name: tool }),
+          JSON.stringify({ tool_name: tool })
         );
       }
 
@@ -287,7 +274,7 @@ function seed() {
           "Stop",
           null,
           `Session ended: ${session.status}`,
-          JSON.stringify({ stop_reason: session.status }),
+          JSON.stringify({ stop_reason: session.status })
         );
       }
     }

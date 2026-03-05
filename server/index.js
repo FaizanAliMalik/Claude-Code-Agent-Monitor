@@ -9,6 +9,7 @@ const agentsRouter = require("./routes/agents");
 const eventsRouter = require("./routes/events");
 const statsRouter = require("./routes/stats");
 const hooksRouter = require("./routes/hooks");
+const analyticsRouter = require("./routes/analytics");
 
 function createApp() {
   const app = express();
@@ -21,6 +22,7 @@ function createApp() {
   app.use("/api/events", eventsRouter);
   app.use("/api/stats", statsRouter);
   app.use("/api/hooks", hooksRouter);
+  app.use("/api/analytics", analyticsRouter);
 
   app.get("/api/health", (_req, res) => {
     res.json({ status: "ok", timestamp: new Date().toISOString() });
@@ -58,6 +60,15 @@ if (require.main === module) {
   const PORT = parseInt(process.env.DASHBOARD_PORT || "4820", 10);
   const app = createApp();
   startServer(app, PORT);
+
+  // Auto-install Claude Code hooks on every startup so users don't have to
+  try {
+    const { installHooks } = require("../scripts/install-hooks");
+    installHooks(true);
+    console.log("Claude Code hooks auto-configured.");
+  } catch {
+    // Non-fatal — user can run npm run install-hooks manually
+  }
 }
 
 module.exports = { createApp, startServer };

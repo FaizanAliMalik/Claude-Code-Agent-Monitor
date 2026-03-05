@@ -62,7 +62,13 @@ const processEvent = db.transaction((hookType, data) => {
       if (toolName === "Agent") {
         const input = data.tool_input || {};
         const subId = uuidv4();
-        const subName = input.description || input.subagent_type || "Subagent";
+        // Use description, then type, then first line of prompt, then fallback
+        const rawName =
+          input.description ||
+          input.subagent_type ||
+          (input.prompt ? input.prompt.split("\n")[0].slice(0, 60) : null) ||
+          "Subagent";
+        const subName = rawName.length > 60 ? rawName.slice(0, 57) + "..." : rawName;
         stmts.insertAgent.run(
           subId,
           sessionId,
@@ -101,11 +107,30 @@ const processEvent = db.transaction((hookType, data) => {
       summary = `Session ended: ${data.stop_reason || "completed"}`;
       const endStatus = data.stop_reason === "error" ? "error" : "completed";
 
+      // Extract token usage from Stop event if present
+      if (data.usage) {
+        stmts.upsertTokenUsage.run(
+          sessionId,
+          data.usage.input_tokens || 0,
+          data.usage.output_tokens || 0,
+          data.usage.cache_read_input_tokens || 0,
+          data.usage.cache_creation_input_tokens || 0
+        );
+      }
+
       // End all active agents in this session
       const agents = stmts.listAgentsBySession.all(sessionId);
       for (const agent of agents) {
         if (agent.status === "working" || agent.status === "connected" || agent.status === "idle") {
-          stmts.updateAgent.run(null, "completed", null, null, new Date().toISOString(), null, agent.id);
+          stmts.updateAgent.run(
+            null,
+            "completed",
+            null,
+            null,
+            new Date().toISOString(),
+            null,
+            agent.id
+          );
           broadcast("agent_updated", stmts.getAgent.get(agent.id));
         }
       }
@@ -120,11 +145,17 @@ const processEvent = db.transaction((hookType, data) => {
       summary = `Subagent completed`;
       // Find the most recent working subagent for this session
       const subagents = stmts.listAgentsBySession.all(sessionId);
-      const workingSub = subagents.find(
-        (a) => a.type === "subagent" && a.status === "working"
-      );
+      const workingSub = subagents.find((a) => a.type === "subagent" && a.status === "working");
       if (workingSub) {
-        stmts.updateAgent.run(null, "completed", null, null, new Date().toISOString(), null, workingSub.id);
+        stmts.updateAgent.run(
+          null,
+          "completed",
+          null,
+          null,
+          new Date().toISOString(),
+          null,
+          workingSub.id
+        );
         broadcast("agent_updated", stmts.getAgent.get(workingSub.id));
         agentId = workingSub.id;
       }
@@ -147,7 +178,7 @@ const processEvent = db.transaction((hookType, data) => {
     eventType,
     toolName,
     summary,
-    JSON.stringify(data),
+    JSON.stringify(data)
     // created_at uses default
   );
 

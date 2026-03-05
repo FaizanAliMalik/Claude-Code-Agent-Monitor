@@ -25,7 +25,7 @@ export function Sessions() {
 
   const load = useCallback(async () => {
     try {
-      const params: { status?: string; limit?: number } = { limit: 100 };
+      const params: { status?: string; limit?: number } = { limit: 500 };
       if (filter) params.status = filter;
       const { sessions: data } = await api.sessions.list(params);
       setSessions(data);
@@ -59,9 +59,7 @@ export function Sessions() {
     <div className="animate-fade-in">
       <div className="flex items-center justify-between mb-8">
         <div>
-          <h2 className="text-xl font-semibold text-gray-100 mb-1">
-            Sessions
-          </h2>
+          <h2 className="text-xl font-semibold text-gray-100 mb-1">Sessions</h2>
           <p className="text-sm text-gray-500">
             {sessions.length} session{sessions.length !== 1 ? "s" : ""} recorded
           </p>
@@ -154,9 +152,7 @@ export function Sessions() {
                     </div>
                   </td>
                   <td className="px-5 py-4">
-                    <SessionStatusBadge
-                      status={session.status as SessionStatus}
-                    />
+                    <SessionStatusBadge status={session.status as SessionStatus} />
                   </td>
                   <td className="px-5 py-4 text-sm text-gray-400">
                     {formatDateTime(session.started_at)}
@@ -166,9 +162,7 @@ export function Sessions() {
                       ? formatDuration(session.started_at, session.ended_at)
                       : "running"}
                   </td>
-                  <td className="px-5 py-4 text-sm text-gray-400">
-                    {session.agent_count ?? "-"}
-                  </td>
+                  <td className="px-5 py-4 text-sm text-gray-400">{session.agent_count ?? "-"}</td>
                   <td className="px-5 py-4 text-[11px] text-gray-500 font-mono">
                     {session.cwd ? truncate(session.cwd, 30) : "-"}
                   </td>

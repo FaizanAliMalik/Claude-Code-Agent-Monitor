@@ -1,12 +1,6 @@
 import { useEffect, useState, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
-import {
-  FolderOpen,
-  Bot,
-  Zap,
-  Activity,
-  ArrowRight,
-} from "lucide-react";
+import { FolderOpen, Bot, Zap, Activity, ArrowRight } from "lucide-react";
 import { api } from "../lib/api";
 import { eventBus } from "../lib/eventBus";
 import { StatCard } from "../components/StatCard";
@@ -32,9 +26,7 @@ export function Dashboard() {
       ]);
       setStats(statsRes);
       setActiveAgents(
-        agentsRes.agents.filter(
-          (a) => a.status === "working" || a.status === "connected"
-        )
+        agentsRes.agents.filter((a) => a.status === "working" || a.status === "connected")
       );
       setRecentEvents(eventsRes.events);
       setError(null);
@@ -81,9 +73,7 @@ export function Dashboard() {
     <div className="space-y-8 animate-fade-in">
       <div>
         <h2 className="text-xl font-semibold text-gray-100 mb-1">Dashboard</h2>
-        <p className="text-sm text-gray-500">
-          Real-time overview of Claude Code agent activity
-        </p>
+        <p className="text-sm text-gray-500">Real-time overview of Claude Code agent activity</p>
       </div>
 
       {/* Stats row */}
@@ -118,13 +108,8 @@ export function Dashboard() {
         {/* Active agents */}
         <div>
           <div className="flex items-center justify-between mb-4">
-            <h3 className="text-sm font-medium text-gray-300">
-              Active Agents
-            </h3>
-            <button
-              onClick={() => navigate("/kanban")}
-              className="btn-ghost text-xs"
-            >
+            <h3 className="text-sm font-medium text-gray-300">Active Agents</h3>
+            <button onClick={() => navigate("/kanban")} className="btn-ghost text-xs">
               View Board <ArrowRight className="w-3 h-3" />
             </button>
           </div>
@@ -146,13 +131,8 @@ export function Dashboard() {
         {/* Recent activity */}
         <div>
           <div className="flex items-center justify-between mb-4">
-            <h3 className="text-sm font-medium text-gray-300">
-              Recent Activity
-            </h3>
-            <button
-              onClick={() => navigate("/activity")}
-              className="btn-ghost text-xs"
-            >
+            <h3 className="text-sm font-medium text-gray-300">Recent Activity</h3>
+            <button onClick={() => navigate("/activity")} className="btn-ghost text-xs">
               View All <ArrowRight className="w-3 h-3" />
             </button>
           </div>
@@ -183,9 +163,7 @@ export function Dashboard() {
                     {event.summary || event.event_type}
                   </span>
                   {event.tool_name && (
-                    <span className="text-[11px] text-gray-500 font-mono">
-                      {event.tool_name}
-                    </span>
+                    <span className="text-[11px] text-gray-500 font-mono">{event.tool_name}</span>
                   )}
                   <span className="text-[11px] text-gray-600 flex-shrink-0">
                     {timeAgo(event.created_at)}

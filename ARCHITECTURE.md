@@ -1,6 +1,6 @@
 # Architecture
 
-### Agent Dashboard -- System Design and Technical Reference
+### Agent Dashboard - System Design and Technical Reference
 
 ![Node.js](https://img.shields.io/badge/Node.js-%3E%3D18-339933?style=flat-square&logo=node.js&logoColor=white)
 ![Express](https://img.shields.io/badge/Express-4.21-000000?style=flat-square&logo=express&logoColor=white)
@@ -15,6 +15,7 @@
 ![Lucide](https://img.shields.io/badge/Lucide_Icons-0.474-F56565?style=flat-square)
 ![PostCSS](https://img.shields.io/badge/PostCSS-8.5-DD3A0A?style=flat-square&logo=postcss&logoColor=white)
 ![Autoprefixer](https://img.shields.io/badge/Autoprefixer-10.4-DD3735?style=flat-square)
+![Python](https://img.shields.io/badge/Python-%3E%3D3.6-3776AB?style=flat-square&logo=python&logoColor=white)
 
 ---
 
@@ -32,6 +33,7 @@
 - [Security Considerations](#security-considerations)
 - [Performance Characteristics](#performance-characteristics)
 - [Deployment Modes](#deployment-modes)
+- [Statusline Utility](#statusline-utility)
 
 ---
 
@@ -55,6 +57,7 @@ C4Context
 ```
 
 **Design goals:**
+
 - Zero-config operation -- auto-discovers sessions from hook events
 - Never block Claude Code -- hooks fail silently with timeouts
 - Instant feedback -- WebSocket push, no polling
@@ -225,16 +228,16 @@ graph TD
 
 ### Server Components
 
-| Module | Responsibility |
-|--------|---------------|
-| `server/index.js` | Express app setup, middleware (CORS, JSON parsing), route mounting, static file serving in production, HTTP server creation |
-| `server/db.js` | SQLite connection with WAL mode, schema migration (CREATE TABLE IF NOT EXISTS), all prepared statements as a reusable `stmts` object |
-| `server/websocket.js` | WebSocket server on `/ws` path, 30s heartbeat with ping/pong dead connection detection, typed broadcast function |
-| `routes/hooks.js` | Core event processing inside a SQLite transaction. Auto-creates sessions/agents. Switch-case dispatch by hook type. Broadcasts all state changes |
-| `routes/sessions.js` | Standard CRUD with pagination. GET includes agent count via LEFT JOIN. POST is idempotent on session ID |
-| `routes/agents.js` | CRUD with status/session_id filtering. PATCH broadcasts `agent_updated` |
-| `routes/events.js` | Read-only event listing with session_id filter and pagination |
-| `routes/stats.js` | Single aggregate query returning total/active counts + status distributions |
+| Module                | Responsibility                                                                                                                                   |
+| --------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `server/index.js`     | Express app setup, middleware (CORS, JSON parsing), route mounting, static file serving in production, HTTP server creation                      |
+| `server/db.js`        | SQLite connection with WAL mode, schema migration (CREATE TABLE IF NOT EXISTS), all prepared statements as a reusable `stmts` object             |
+| `server/websocket.js` | WebSocket server on `/ws` path, 30s heartbeat with ping/pong dead connection detection, typed broadcast function                                 |
+| `routes/hooks.js`     | Core event processing inside a SQLite transaction. Auto-creates sessions/agents. Switch-case dispatch by hook type. Broadcasts all state changes |
+| `routes/sessions.js`  | Standard CRUD with pagination. GET includes agent count via LEFT JOIN. POST is idempotent on session ID                                          |
+| `routes/agents.js`    | CRUD with status/session_id filtering. PATCH broadcasts `agent_updated`                                                                          |
+| `routes/events.js`    | Read-only event listing with session_id filter and pagination                                                                                    |
+| `routes/stats.js`     | Single aggregate query returning total/active counts + status distributions                                                                      |
 
 ### Request Processing
 
@@ -366,13 +369,13 @@ graph LR
     ALL["All routes"] --> LAYOUT["Layout wrapper<br/>(Sidebar + Outlet)"]
 ```
 
-| Route | Page | Data Sources |
-|-------|------|-------------|
-| `/` | Dashboard | `GET /api/stats`, `GET /api/agents`, `GET /api/events` |
-| `/kanban` | KanbanBoard | `GET /api/agents?limit=200` |
-| `/sessions` | Sessions | `GET /api/sessions` |
-| `/sessions/:id` | SessionDetail | `GET /api/sessions/:id` (includes agents + events) |
-| `/activity` | ActivityFeed | `GET /api/events?limit=100` |
+| Route           | Page          | Data Sources                                           |
+| --------------- | ------------- | ------------------------------------------------------ |
+| `/`             | Dashboard     | `GET /api/stats`, `GET /api/agents`, `GET /api/events` |
+| `/kanban`       | KanbanBoard   | `GET /api/agents?limit=200`                            |
+| `/sessions`     | Sessions      | `GET /api/sessions`                                    |
+| `/sessions/:id` | SessionDetail | `GET /api/sessions/:id` (includes agents + events)     |
+| `/activity`     | ActivityFeed  | `GET /api/events?limit=100`                            |
 
 ---
 
@@ -427,27 +430,28 @@ erDiagram
 
 ### Indexes
 
-| Index | Table | Column(s) | Purpose |
-|-------|-------|-----------|---------|
-| `idx_agents_session` | agents | `session_id` | Fast agent lookup by session |
-| `idx_agents_status` | agents | `status` | Kanban board column queries |
-| `idx_events_session` | events | `session_id` | Session detail event list |
-| `idx_events_type` | events | `event_type` | Filter events by type |
-| `idx_events_created` | events | `created_at DESC` | Activity feed ordering |
-| `idx_sessions_status` | sessions | `status` | Status filter on sessions page |
-| `idx_sessions_started` | sessions | `started_at DESC` | Default sort order |
+| Index                  | Table    | Column(s)         | Purpose                        |
+| ---------------------- | -------- | ----------------- | ------------------------------ |
+| `idx_agents_session`   | agents   | `session_id`      | Fast agent lookup by session   |
+| `idx_agents_status`    | agents   | `status`          | Kanban board column queries    |
+| `idx_events_session`   | events   | `session_id`      | Session detail event list      |
+| `idx_events_type`      | events   | `event_type`      | Filter events by type          |
+| `idx_events_created`   | events   | `created_at DESC` | Activity feed ordering         |
+| `idx_sessions_status`  | sessions | `status`          | Status filter on sessions page |
+| `idx_sessions_started` | sessions | `started_at DESC` | Default sort order             |
 
 ### SQLite Configuration
 
-| Pragma | Value | Rationale |
-|--------|-------|-----------|
-| `journal_mode` | `WAL` | Concurrent reads during writes, better performance for read-heavy workload |
-| `foreign_keys` | `ON` | Referential integrity enforcement |
-| `busy_timeout` | `5000` | Wait up to 5s for write lock instead of failing immediately |
+| Pragma         | Value  | Rationale                                                                  |
+| -------------- | ------ | -------------------------------------------------------------------------- |
+| `journal_mode` | `WAL`  | Concurrent reads during writes, better performance for read-heavy workload |
+| `foreign_keys` | `ON`   | Referential integrity enforcement                                          |
+| `busy_timeout` | `5000` | Wait up to 5s for write lock instead of failing immediately                |
 
 ### Prepared Statements
 
 All queries use prepared statements (`db.prepare()`) for:
+
 - **Security** -- parameterized queries prevent SQL injection
 - **Performance** -- compiled once, executed many times
 - **Reliability** -- syntax errors caught at startup, not runtime
@@ -552,6 +556,7 @@ flowchart TD
 ```
 
 **Key design decisions:**
+
 - Always exits 0 -- never blocks Claude Code regardless of server state
 - 3-second HTTP timeout + 5-second process safety net
 - Uses Node.js `http` module directly -- no dependencies
@@ -619,6 +624,7 @@ graph TD
 ```
 
 **Why no Redux / Zustand / Context:**
+
 - Each page owns its data and lifecycle
 - No cross-page state sharing needed
 - WebSocket events trigger reload or append, not complex state merging
@@ -638,6 +644,7 @@ useEffect(() => {
 ```
 
 This pattern ensures:
+
 - No memory leaks (cleanup on unmount)
 - No stale closures (subscribe with latest callback ref)
 - Only active pages receive messages
@@ -646,30 +653,30 @@ This pattern ensures:
 
 ## Security Considerations
 
-| Area | Approach |
-|------|----------|
-| **SQL injection** | All queries use prepared statements with parameterized values |
-| **Request size** | Express JSON body parser limited to 1MB |
-| **Input validation** | Required fields checked before database operations; CHECK constraints on status enums |
-| **Hook safety** | Hook handler always exits 0; 5s max lifetime; uses `127.0.0.1` not external hosts |
-| **CORS** | Enabled for development; in production, same-origin (Express serves the client) |
-| **No auth** | Intentional -- this is a local development tool. Server binds to `0.0.0.0` only for LAN access; restrict with `DASHBOARD_PORT` or firewall rules if needed |
-| **No secrets** | No API keys, tokens, or credentials stored or transmitted |
-| **Dependency surface** | Minimal: 5 runtime server deps, 4 runtime client deps |
+| Area                   | Approach                                                                                                                                                   |
+| ---------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **SQL injection**      | All queries use prepared statements with parameterized values                                                                                              |
+| **Request size**       | Express JSON body parser limited to 1MB                                                                                                                    |
+| **Input validation**   | Required fields checked before database operations; CHECK constraints on status enums                                                                      |
+| **Hook safety**        | Hook handler always exits 0; 5s max lifetime; uses `127.0.0.1` not external hosts                                                                          |
+| **CORS**               | Enabled for development; in production, same-origin (Express serves the client)                                                                            |
+| **No auth**            | Intentional -- this is a local development tool. Server binds to `0.0.0.0` only for LAN access; restrict with `DASHBOARD_PORT` or firewall rules if needed |
+| **No secrets**         | No API keys, tokens, or credentials stored or transmitted                                                                                                  |
+| **Dependency surface** | Minimal: 5 runtime server deps, 4 runtime client deps                                                                                                      |
 
 ---
 
 ## Performance Characteristics
 
-| Metric | Value | Notes |
-|--------|-------|-------|
-| **Server startup** | < 200ms | SQLite opens instantly; schema migration is idempotent |
-| **Hook latency** | < 50ms | Transaction + broadcast, no async I/O beyond SQLite |
-| **Client bundle** | 200 KB JS, 17 KB CSS | Gzipped: ~63 KB JS, ~4 KB CSS |
-| **WebSocket latency** | < 5ms | Local loopback, JSON serialization only |
-| **SQLite write throughput** | ~50,000 inserts/sec | WAL mode on SSD; far exceeds hook event rate |
-| **Max events before slowdown** | ~1M rows | SQLite handles this easily; pagination prevents full-table scans |
-| **Memory usage** | ~30 MB server, ~15 MB client | SQLite in-process, no ORM overhead |
+| Metric                         | Value                        | Notes                                                            |
+| ------------------------------ | ---------------------------- | ---------------------------------------------------------------- |
+| **Server startup**             | < 200ms                      | SQLite opens instantly; schema migration is idempotent           |
+| **Hook latency**               | < 50ms                       | Transaction + broadcast, no async I/O beyond SQLite              |
+| **Client bundle**              | 200 KB JS, 17 KB CSS         | Gzipped: ~63 KB JS, ~4 KB CSS                                    |
+| **WebSocket latency**          | < 5ms                        | Local loopback, JSON serialization only                          |
+| **SQLite write throughput**    | ~50,000 inserts/sec          | WAL mode on SSD; far exceeds hook event rate                     |
+| **Max events before slowdown** | ~1M rows                     | SQLite handles this easily; pagination prevents full-table scans |
+| **Memory usage**               | ~30 MB server, ~15 MB client | SQLite in-process, no ORM overhead                               |
 
 ### SQLite WAL Mode Benefits
 
@@ -721,26 +728,83 @@ graph LR
     style DIST fill:#646CFF,stroke:#818cf8,color:#fff
 ```
 
-| Aspect | Development | Production |
-|--------|-------------|------------|
-| **Processes** | 2 (Express + Vite) | 1 (Express) |
-| **Client** | Vite HMR on :5173 | Static files from `client/dist` |
-| **API proxy** | Vite proxies `/api` + `/ws` to :4820 | Same origin, no proxy needed |
-| **File watching** | `node --watch` + Vite HMR | None |
-| **Source maps** | Inline | External files |
+| Aspect            | Development                          | Production                      |
+| ----------------- | ------------------------------------ | ------------------------------- |
+| **Processes**     | 2 (Express + Vite)                   | 1 (Express)                     |
+| **Client**        | Vite HMR on :5173                    | Static files from `client/dist` |
+| **API proxy**     | Vite proxies `/api` + `/ws` to :4820 | Same origin, no proxy needed    |
+| **File watching** | `node --watch` + Vite HMR            | None                            |
+| **Source maps**   | Inline                               | External files                  |
+
+---
+
+## Statusline Utility
+
+The `statusline/` directory contains a standalone CLI statusline for Claude Code, separate from the web dashboard. It renders a color-coded bar at the bottom of the Claude Code terminal.
+
+### Data Flow
+
+```mermaid
+sequenceDiagram
+    participant CC as Claude Code
+    participant SH as statusline-command.sh
+    participant PY as statusline.py
+    participant GIT as git CLI
+
+    CC->>SH: stdin (JSON payload)
+    SH->>PY: Pipes stdin through
+    PY->>PY: Parse JSON (model, cwd, context_window)
+    PY->>GIT: git symbolic-ref --short HEAD
+    GIT-->>PY: Branch name
+    PY->>PY: Build ANSI-colored segments
+    PY-->>CC: stdout (formatted statusline)
+```
+
+### Segments
+
+| Segment      | Source                                | Color Logic                                        |
+| ------------ | ------------------------------------- | -------------------------------------------------- |
+| Model        | `data.model.display_name`             | Always cyan                                        |
+| User         | `$USERNAME` / `$USER` env var         | Always green                                       |
+| Working Dir  | `data.workspace.current_dir`          | Always yellow, `~` prefix for home                 |
+| Git Branch   | `git symbolic-ref --short HEAD`       | Always magenta, hidden outside git repos           |
+| Context Bar  | `data.context_window.used_percentage` | Green < 50%, Yellow 50–79%, Red >= 80%             |
+| Token Counts | `data.context_window.current_usage`   | Always dim; `↑` input, `↓` output, `c` cache reads |
+
+### Integration
+
+The statusline is configured in `~/.claude/settings.json` via the `statusLine` key:
+
+```json
+{
+  "statusLine": {
+    "type": "command",
+    "command": "bash \"/path/to/.claude/statusline-command.sh\""
+  }
+}
+```
+
+Claude Code invokes this command on each update, piping a JSON payload to stdin. The script reads the JSON, extracts fields, runs `git` for branch info, and prints ANSI-formatted output to stdout.
+
+**Design decisions:**
+
+- **Python 3.6+** -- available on virtually all systems, handles ANSI and JSON natively
+- **No dependencies** -- uses only stdlib (`sys`, `json`, `os`, `subprocess`)
+- **Shell wrapper** -- `statusline-command.sh` sets `PYTHONUTF8=1` for Windows Unicode support and resolves the absolute path to the Python script
+- **Fail-safe** -- exits silently on empty input or JSON parse errors, never blocks Claude Code
 
 ---
 
 ## Technology Choices
 
-| Technology | Why This Over Alternatives |
-|-----------|---------------------------|
+| Technology                      | Why This Over Alternatives                                                                                                                      |
+| ------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------- |
 | **SQLite** (via better-sqlite3) | Zero-config, embedded, no server process. WAL mode gives concurrent reads. Synchronous API is simpler than async alternatives for this use case |
-| **Express** | Battle-tested, minimal, well-understood. Overkill would be Fastify for this scale; underkill would be raw `http` module |
-| **ws** | Fastest, most lightweight WebSocket library for Node. No Socket.IO overhead needed since we only push JSON messages |
-| **React 18** | Stable, widely known, strong TypeScript support. No need for Server Components or RSC given this is a client-rendered SPA |
-| **Vite** | Fast builds, native ESM, excellent dev experience. Proxy config handles the dev server split cleanly |
-| **Tailwind CSS** | Utility-first approach keeps styles colocated with markup. No CSS module boilerplate. Custom theme config for the dark UI |
-| **React Router 6** | Standard routing for React SPAs. Layout routes with `<Outlet>` give clean shell composition |
-| **Lucide React** | Tree-shakeable icon library. Only imports what's used (~20 icons) |
-| **TypeScript Strict** | Catches null/undefined bugs at compile time. `noUncheckedIndexedAccess` prevents array bounds issues |
+| **Express**                     | Battle-tested, minimal, well-understood. Overkill would be Fastify for this scale; underkill would be raw `http` module                         |
+| **ws**                          | Fastest, most lightweight WebSocket library for Node. No Socket.IO overhead needed since we only push JSON messages                             |
+| **React 18**                    | Stable, widely known, strong TypeScript support. No need for Server Components or RSC given this is a client-rendered SPA                       |
+| **Vite**                        | Fast builds, native ESM, excellent dev experience. Proxy config handles the dev server split cleanly                                            |
+| **Tailwind CSS**                | Utility-first approach keeps styles colocated with markup. No CSS module boilerplate. Custom theme config for the dark UI                       |
+| **React Router 6**              | Standard routing for React SPAs. Layout routes with `<Outlet>` give clean shell composition                                                     |
+| **Lucide React**                | Tree-shakeable icon library. Only imports what's used (~20 icons)                                                                               |
+| **TypeScript Strict**           | Catches null/undefined bugs at compile time. `noUncheckedIndexedAccess` prevents array bounds issues                                            |

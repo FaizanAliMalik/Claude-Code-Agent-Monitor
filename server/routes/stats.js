@@ -9,9 +9,7 @@ router.get("/", (_req, res) => {
   const agentsByStatus = stmts.agentStatusCounts.all();
   const sessionsByStatus = stmts.sessionStatusCounts.all();
 
-  const today = new Date();
-  today.setHours(0, 0, 0, 0);
-  const eventsToday = stmts.countEventsSince.get(today.toISOString());
+  const eventsToday = stmts.countEventsToday.get();
 
   res.json({
     ...overview,

@@ -28,9 +28,5 @@ interface SessionStatusBadgeProps {
 
 export function SessionStatusBadge({ status }: SessionStatusBadgeProps) {
   const config = SESSION_STATUS_CONFIG[status];
-  return (
-    <span className={`badge ${config.bg} ${config.color}`}>
-      {config.label}
-    </span>
-  );
+  return <span className={`badge ${config.bg} ${config.color}`}>{config.label}</span>;
 }

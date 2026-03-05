@@ -1,24 +1,12 @@
 import { useEffect, useState, useCallback } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import {
-  ArrowLeft,
-  Bot,
-  Clock,
-  FolderOpen,
-  Cpu,
-  RefreshCw,
-} from "lucide-react";
+import { ArrowLeft, Bot, Clock, FolderOpen, Cpu, RefreshCw } from "lucide-react";
 import { api } from "../lib/api";
 import { eventBus } from "../lib/eventBus";
 import { AgentCard } from "../components/AgentCard";
 import { SessionStatusBadge, AgentStatusBadge } from "../components/StatusBadge";
 import { formatDateTime, formatDuration, timeAgo } from "../lib/format";
-import type {
-  Session,
-  Agent,
-  DashboardEvent,
-  SessionStatus,
-} from "../lib/types";
+import type { Session, Agent, DashboardEvent, SessionStatus } from "../lib/types";
 
 export function SessionDetail() {
   const { id } = useParams<{ id: string }>();
@@ -63,9 +51,7 @@ export function SessionDetail() {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center h-64 text-gray-500">
-        Loading session...
-      </div>
+      <div className="flex items-center justify-center h-64 text-gray-500">Loading session...</div>
     );
   }
 
@@ -84,10 +70,7 @@ export function SessionDetail() {
     <div className="animate-fade-in space-y-8">
       {/* Header */}
       <div className="flex items-start gap-4">
-        <button
-          onClick={() => navigate("/sessions")}
-          className="btn-ghost mt-1"
-        >
+        <button onClick={() => navigate("/sessions")} className="btn-ghost mt-1">
           <ArrowLeft className="w-4 h-4" />
         </button>
         <div className="flex-1">
@@ -116,8 +99,7 @@ export function SessionDetail() {
             <span className="flex items-center gap-1.5">
               <Clock className="w-3.5 h-3.5" />
               {formatDateTime(session.started_at)}
-              {session.ended_at &&
-                ` - ${formatDuration(session.started_at, session.ended_at)}`}
+              {session.ended_at && ` - ${formatDuration(session.started_at, session.ended_at)}`}
             </span>
           </div>
         </div>
@@ -145,9 +127,7 @@ export function SessionDetail() {
 
       {/* Event Timeline */}
       <div>
-        <h3 className="text-sm font-medium text-gray-300 mb-4">
-          Event Timeline ({events.length})
-        </h3>
+        <h3 className="text-sm font-medium text-gray-300 mb-4">Event Timeline ({events.length})</h3>
         {events.length === 0 ? (
           <p className="text-sm text-gray-500">No events recorded.</p>
         ) : (

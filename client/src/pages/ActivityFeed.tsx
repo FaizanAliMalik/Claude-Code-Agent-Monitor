@@ -68,9 +68,7 @@ export function ActivityFeed() {
     <div className="animate-fade-in">
       <div className="flex items-center justify-between mb-8">
         <div>
-          <h2 className="text-xl font-semibold text-gray-100 mb-1">
-            Activity Feed
-          </h2>
+          <h2 className="text-xl font-semibold text-gray-100 mb-1">Activity Feed</h2>
           <p className="text-sm text-gray-500">
             Real-time stream of all agent events
             {paused && (
@@ -81,10 +79,7 @@ export function ActivityFeed() {
           </p>
         </div>
         <div className="flex items-center gap-2">
-          <button
-            onClick={() => (paused ? resume() : setPaused(true))}
-            className="btn-ghost"
-          >
+          <button onClick={() => (paused ? resume() : setPaused(true))} className="btn-ghost">
             {paused ? (
               <>
                 <Play className="w-4 h-4" /> Resume

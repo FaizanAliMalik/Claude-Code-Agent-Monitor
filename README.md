@@ -10,6 +10,7 @@
 ![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-3.4-06B6D4?style=flat-square&logo=tailwindcss&logoColor=white)
 ![SQLite](https://img.shields.io/badge/SQLite-3-003B57?style=flat-square&logo=sqlite&logoColor=white)
 ![WebSocket](https://img.shields.io/badge/WebSocket-RFC_6455-010101?style=flat-square&logo=socketdotio&logoColor=white)
+![Python](https://img.shields.io/badge/Python-%3E%3D3.6-3776AB?style=flat-square&logo=python&logoColor=white)
 ![License](https://img.shields.io/badge/License-MIT-yellow?style=flat-square)
 
 ---
@@ -27,20 +28,41 @@ graph LR
     style D fill:#10b981,stroke:#34d399,color:#fff
 ```
 
+<p align="center">
+  <img src="images/dashboard.png" alt="Dashboard Overview" width="100%">
+</p>
+
+<p align="center">
+  <img src="images/board.png" alt="Board Overview" width="100%">
+</p>
+
+<p align="center">
+  <img src="images/sessions.png" alt="Sessions Overview" width="100%">
+</p>
+
+<p align="center">
+  <img src="images/feed.png" alt="Activity Feed Overview" width="100%">
+</p>
+
+<p align="center">
+  <img src="images/analytics.png" alt="Analytics Overview" width="100%">
+</p>
+
 ---
 
 ## Features
 
-| Feature | Description |
-|---------|-------------|
-| **Dashboard** | Overview stats, active agent cards, recent activity feed |
-| **Kanban Board** | 5-column agent status board (Idle / Connected / Working / Completed / Error) |
-| **Sessions** | Searchable, filterable table of all Claude Code sessions |
-| **Session Detail** | Per-session agent cards and full event timeline |
-| **Activity Feed** | Real-time streaming event log with pause/resume |
-| **Live Updates** | WebSocket push -- no polling, instant UI updates |
-| **Auto-Discovery** | Sessions and agents are created automatically from hook events |
-| **Seed Data** | Built-in seed script for demos and development |
+| Feature            | Description                                                                  |
+| ------------------ | ---------------------------------------------------------------------------- |
+| **Dashboard**      | Overview stats, active agent cards, recent activity feed                     |
+| **Kanban Board**   | 5-column agent status board (Idle / Connected / Working / Completed / Error) |
+| **Sessions**       | Searchable, filterable table of all Claude Code sessions                     |
+| **Session Detail** | Per-session agent cards and full event timeline                              |
+| **Activity Feed**  | Real-time streaming event log with pause/resume                              |
+| **Live Updates**   | WebSocket push -- no polling, instant UI updates                             |
+| **Auto-Discovery** | Sessions and agents are created automatically from hook events               |
+| **Seed Data**      | Built-in seed script for demos and development                               |
+| **Statusline**     | Color-coded CLI statusline showing model, context usage, git branch, tokens  |
 
 ---
 
@@ -79,10 +101,10 @@ npm run build && npm start
 
 ### 4. Open
 
-| Mode | URL |
-|------|-----|
+| Mode        | URL                     |
+| ----------- | ----------------------- |
 | Development | `http://localhost:5173` |
-| Production | `http://localhost:4820` |
+| Production  | `http://localhost:4820` |
 
 ### Optional: Seed Demo Data
 
@@ -163,26 +185,26 @@ stateDiagram-v2
 
 ## Configuration
 
-| Environment Variable | Default | Description |
-|---------------------|---------|-------------|
-| `DASHBOARD_PORT` | `4820` | Port for the Express server |
-| `CLAUDE_DASHBOARD_PORT` | `4820` | Port used by hook handler to reach the server |
-| `NODE_ENV` | `development` | Set to `production` to serve the built client |
+| Environment Variable    | Default       | Description                                   |
+| ----------------------- | ------------- | --------------------------------------------- |
+| `DASHBOARD_PORT`        | `4820`        | Port for the Express server                   |
+| `CLAUDE_DASHBOARD_PORT` | `4820`        | Port used by hook handler to reach the server |
+| `NODE_ENV`              | `development` | Set to `production` to serve the built client |
 
 ---
 
 ## npm Scripts
 
-| Command | Description |
-|---------|-------------|
-| `npm run setup` | Install server and client dependencies |
-| `npm run dev` | Start server (watch mode) + client (Vite HMR) concurrently |
-| `npm run dev:server` | Start only the Express server with `--watch` |
-| `npm run dev:client` | Start only the Vite dev server |
-| `npm run build` | TypeScript check + Vite production build |
-| `npm start` | Start production server (serves built client) |
-| `npm run install-hooks` | Configure Claude Code hooks in `~/.claude/settings.json` |
-| `npm run seed` | Populate database with sample data |
+| Command                 | Description                                                |
+| ----------------------- | ---------------------------------------------------------- |
+| `npm run setup`         | Install server and client dependencies                     |
+| `npm run dev`           | Start server (watch mode) + client (Vite HMR) concurrently |
+| `npm run dev:server`    | Start only the Express server with `--watch`               |
+| `npm run dev:client`    | Start only the Vite dev server                             |
+| `npm run build`         | TypeScript check + Vite production build                   |
+| `npm start`             | Start production server (serves built client)              |
+| `npm run install-hooks` | Configure Claude Code hooks in `~/.claude/settings.json`   |
+| `npm run seed`          | Populate database with sample data                         |
 
 ---
 
@@ -192,44 +214,44 @@ All endpoints return JSON. Error responses follow the shape `{ error: { code, me
 
 ### Health
 
-| Method | Path | Description |
-|--------|------|-------------|
-| `GET` | `/api/health` | Returns `{ status: "ok", timestamp }` |
+| Method | Path          | Description                           |
+| ------ | ------------- | ------------------------------------- |
+| `GET`  | `/api/health` | Returns `{ status: "ok", timestamp }` |
 
 ### Sessions
 
-| Method | Path | Query Params | Description |
-|--------|------|-------------|-------------|
-| `GET` | `/api/sessions` | `status`, `limit`, `offset` | List sessions with agent counts |
-| `GET` | `/api/sessions/:id` | -- | Session detail with agents and events |
-| `POST` | `/api/sessions` | -- | Create session (idempotent on `id`) |
-| `PATCH` | `/api/sessions/:id` | -- | Update session status/metadata |
+| Method  | Path                | Query Params                | Description                           |
+| ------- | ------------------- | --------------------------- | ------------------------------------- |
+| `GET`   | `/api/sessions`     | `status`, `limit`, `offset` | List sessions with agent counts       |
+| `GET`   | `/api/sessions/:id` | --                          | Session detail with agents and events |
+| `POST`  | `/api/sessions`     | --                          | Create session (idempotent on `id`)   |
+| `PATCH` | `/api/sessions/:id` | --                          | Update session status/metadata        |
 
 ### Agents
 
-| Method | Path | Query Params | Description |
-|--------|------|-------------|-------------|
-| `GET` | `/api/agents` | `status`, `session_id`, `limit`, `offset` | List agents with filters |
-| `GET` | `/api/agents/:id` | -- | Single agent detail |
-| `POST` | `/api/agents` | -- | Create agent |
-| `PATCH` | `/api/agents/:id` | -- | Update agent status/task/tool |
+| Method  | Path              | Query Params                              | Description                   |
+| ------- | ----------------- | ----------------------------------------- | ----------------------------- |
+| `GET`   | `/api/agents`     | `status`, `session_id`, `limit`, `offset` | List agents with filters      |
+| `GET`   | `/api/agents/:id` | --                                        | Single agent detail           |
+| `POST`  | `/api/agents`     | --                                        | Create agent                  |
+| `PATCH` | `/api/agents/:id` | --                                        | Update agent status/task/tool |
 
 ### Events
 
-| Method | Path | Query Params | Description |
-|--------|------|-------------|-------------|
-| `GET` | `/api/events` | `session_id`, `limit`, `offset` | List events (newest first) |
+| Method | Path          | Query Params                    | Description                |
+| ------ | ------------- | ------------------------------- | -------------------------- |
+| `GET`  | `/api/events` | `session_id`, `limit`, `offset` | List events (newest first) |
 
 ### Stats
 
-| Method | Path | Description |
-|--------|------|-------------|
-| `GET` | `/api/stats` | Aggregate counts, status distributions, WS connections |
+| Method | Path         | Description                                            |
+| ------ | ------------ | ------------------------------------------------------ |
+| `GET`  | `/api/stats` | Aggregate counts, status distributions, WS connections |
 
 ### Hooks
 
-| Method | Path | Description |
-|--------|------|-------------|
+| Method | Path               | Description                                  |
+| ------ | ------------------ | -------------------------------------------- |
 | `POST` | `/api/hooks/event` | Receive and process a Claude Code hook event |
 
 **Hook event payload:**
@@ -265,13 +287,13 @@ Connect to `ws://localhost:4820/ws` to receive real-time push messages:
 
 The dashboard processes these Claude Code hook types:
 
-| Hook Type | Trigger | Dashboard Action |
-|-----------|---------|-----------------|
-| `PreToolUse` | Agent starts using a tool | Updates agent to `working`, sets `current_tool`. If tool is `Agent`, creates subagent record |
-| `PostToolUse` | Tool execution completed | Updates agent to `connected`, clears `current_tool` |
-| `Stop` | Session ended | Marks all agents `completed`, ends session |
-| `SubagentStop` | Subagent finished | Marks most recent working subagent `completed` |
-| `Notification` | Agent notification | Logs event |
+| Hook Type      | Trigger                   | Dashboard Action                                                                             |
+| -------------- | ------------------------- | -------------------------------------------------------------------------------------------- |
+| `PreToolUse`   | Agent starts using a tool | Updates agent to `working`, sets `current_tool`. If tool is `Agent`, creates subagent record |
+| `PostToolUse`  | Tool execution completed  | Updates agent to `connected`, clears `current_tool`                                          |
+| `Stop`         | Session ended             | Marks all agents `completed`, ends session                                                   |
+| `SubagentStop` | Subagent finished         | Marks most recent working subagent `completed`                                               |
+| `Notification` | Agent notification        | Logs event                                                                                   |
 
 ---
 
@@ -281,6 +303,31 @@ The dashboard processes these Claude Code hook types:
 - **Location:** `data/dashboard.db`
 - **Journal mode:** WAL (concurrent reads during writes)
 - **Reset:** Delete `data/dashboard.db` to clear all data
+
+---
+
+## Statusline
+
+A standalone CLI statusline utility for Claude Code that displays model name, user, working directory, git branch, context window usage bar, and token counts -- all color-coded with ANSI escape sequences.
+
+```
+Sonnet 4.6 | nguyens6 | ~/agent-dashboard/client | main | ████████░░ 79% | 3↑ 2↓ 156586c
+```
+
+| Segment     | Color                | Example             |
+| ----------- | -------------------- | ------------------- |
+| Model       | Cyan                 | `Sonnet 4.6`        |
+| User        | Green                | `nguyens6`          |
+| CWD         | Yellow               | `~/agent-dashboard` |
+| Git branch  | Magenta              | `main`              |
+| Context bar | Green / Yellow / Red | `████████░░ 79%`    |
+| Tokens      | Dim                  | `3↑ 2↓ 156586c`     |
+
+See [`statusline/README.md`](statusline/README.md) for installation instructions.
+
+<p align="center">
+  <img src="images/statusline.png" alt="Statusline Demo" width="600">
+</p>
 
 ---
 
@@ -333,6 +380,10 @@ agent-dashboard/
 |   |-- hook-handler.js          # Lightweight stdin-to-HTTP forwarder
 |   |-- install-hooks.js         # Auto-configures ~/.claude/settings.json
 |   +-- seed.js                  # Sample data generator
+|-- statusline/
+|   |-- README.md                # Statusline installation & usage guide
+|   |-- statusline.py            # Python script that renders the statusline
+|   +-- statusline-command.sh    # Shell wrapper for Claude Code's statusLine config
 +-- data/
     +-- dashboard.db             # SQLite database (gitignored)
 ```
@@ -341,16 +392,16 @@ agent-dashboard/
 
 ## Troubleshooting
 
-| Problem | Solution |
-|---------|----------|
+| Problem                           | Solution                                                                                                                                                         |
+| --------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `better-sqlite3` fails to install | Ensure you have Node.js >= 18. On Windows, you may need the [Visual Studio Build Tools](https://visualstudio.microsoft.com/visual-cpp-build-tools/) C++ workload |
-| Hooks not firing | Run `npm run install-hooks` and restart Claude Code. Verify hooks exist in `~/.claude/settings.json` |
-| Dashboard shows no data | Ensure the server is running (`npm run dev`) before starting a Claude Code session. Check `http://localhost:4820/api/health` |
-| WebSocket disconnected | The client auto-reconnects every 2 seconds. Check that port 4820 is not blocked by a firewall |
-| Stale data after restart | The database persists across restarts. Run `npm run seed` for fresh demo data, or delete `data/dashboard.db` to reset |
+| Hooks not firing                  | Run `npm run install-hooks` and restart Claude Code. Verify hooks exist in `~/.claude/settings.json`                                                             |
+| Dashboard shows no data           | Ensure the server is running (`npm run dev`) before starting a Claude Code session. Check `http://localhost:4820/api/health`                                     |
+| WebSocket disconnected            | The client auto-reconnects every 2 seconds. Check that port 4820 is not blocked by a firewall                                                                    |
+| Stale data after restart          | The database persists across restarts. Run `npm run seed` for fresh demo data, or delete `data/dashboard.db` to reset                                            |
 
 ---
 
 ## License
 
-MIT
+MIT. See [LICENSE](LICENSE) for details.

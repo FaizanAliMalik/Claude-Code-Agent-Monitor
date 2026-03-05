@@ -20,14 +20,7 @@ describe("StatCard", () => {
   });
 
   it("should render trend when provided", () => {
-    render(
-      <StatCard
-        label="Sessions"
-        value={10}
-        icon={Activity}
-        trend="3 active"
-      />
-    );
+    render(<StatCard label="Sessions" value={10} icon={Activity} trend="3 active" />);
     expect(screen.getByText("3 active")).toBeInTheDocument();
   });
 
@@ -37,9 +30,7 @@ describe("StatCard", () => {
   });
 
   it("should render the icon", () => {
-    const { container } = render(
-      <StatCard label="Test" value={0} icon={Activity} />
-    );
+    const { container } = render(<StatCard label="Test" value={0} icon={Activity} />);
     // Lucide renders as SVG
     const svg = container.querySelector("svg");
     expect(svg).toBeInTheDocument();
@@ -47,21 +38,14 @@ describe("StatCard", () => {
 
   it("should apply custom accent color", () => {
     const { container } = render(
-      <StatCard
-        label="Test"
-        value={0}
-        icon={Activity}
-        accentColor="text-emerald-400"
-      />
+      <StatCard label="Test" value={0} icon={Activity} accentColor="text-emerald-400" />
     );
     const svg = container.querySelector("svg");
     expect(svg?.className?.baseVal ?? svg?.getAttribute("class")).toContain("text-emerald-400");
   });
 
   it("should apply default accent color when not specified", () => {
-    const { container } = render(
-      <StatCard label="Test" value={0} icon={Activity} />
-    );
+    const { container } = render(<StatCard label="Test" value={0} icon={Activity} />);
     const svg = container.querySelector("svg");
     expect(svg?.className?.baseVal ?? svg?.getAttribute("class")).toContain("text-accent");
   });

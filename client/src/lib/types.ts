@@ -52,13 +52,33 @@ export interface Stats {
   sessions_by_status: Record<string, number>;
 }
 
+export interface Analytics {
+  tokens: {
+    total_input: number;
+    total_output: number;
+    total_cache_read: number;
+    total_cache_write: number;
+  };
+  tool_usage: Array<{ tool_name: string; count: number }>;
+  daily_events: Array<{ date: string; count: number }>;
+  daily_sessions: Array<{ date: string; count: number }>;
+  agent_types: Array<{ subagent_type: string; count: number }>;
+  event_types: Array<{ event_type: string; count: number }>;
+  avg_events_per_session: number;
+  total_subagents: number;
+  overview: {
+    total_sessions: number;
+    active_sessions: number;
+    active_agents: number;
+    total_agents: number;
+    total_events: number;
+  };
+  agents_by_status: Record<string, number>;
+  sessions_by_status: Record<string, number>;
+}
+
 export interface WSMessage {
-  type:
-    | "session_created"
-    | "session_updated"
-    | "agent_created"
-    | "agent_updated"
-    | "new_event";
+  type: "session_created" | "session_updated" | "agent_created" | "agent_updated" | "new_event";
   data: Session | Agent | DashboardEvent;
   timestamp: string;
 }
@@ -103,8 +123,20 @@ export const SESSION_STATUS_CONFIG: Record<
   SessionStatus,
   { label: string; color: string; bg: string }
 > = {
-  active: { label: "Active", color: "text-emerald-400", bg: "bg-emerald-500/10 border-emerald-500/20" },
-  completed: { label: "Completed", color: "text-violet-400", bg: "bg-violet-500/10 border-violet-500/20" },
+  active: {
+    label: "Active",
+    color: "text-emerald-400",
+    bg: "bg-emerald-500/10 border-emerald-500/20",
+  },
+  completed: {
+    label: "Completed",
+    color: "text-violet-400",
+    bg: "bg-violet-500/10 border-violet-500/20",
+  },
   error: { label: "Error", color: "text-red-400", bg: "bg-red-500/10 border-red-500/20" },
-  abandoned: { label: "Abandoned", color: "text-yellow-400", bg: "bg-yellow-500/10 border-yellow-500/20" },
+  abandoned: {
+    label: "Abandoned",
+    color: "text-yellow-400",
+    bg: "bg-yellow-500/10 border-yellow-500/20",
+  },
 };

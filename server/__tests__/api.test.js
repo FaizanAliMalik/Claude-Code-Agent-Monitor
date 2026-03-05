@@ -506,7 +506,10 @@ describe("Hook Event Processing", () => {
 
   it("should record events in the events table", async () => {
     const eventsRes = await fetch("/api/events?session_id=hook-sess-1");
-    assert.ok(eventsRes.body.events.length >= 4, "Should have multiple events from hook processing");
+    assert.ok(
+      eventsRes.body.events.length >= 4,
+      "Should have multiple events from hook processing"
+    );
 
     const types = eventsRes.body.events.map((e) => e.event_type);
     assert.ok(types.includes("PreToolUse"));
@@ -528,7 +531,15 @@ describe("Database Integrity", () => {
   it("should enforce agent status CHECK constraint", () => {
     assert.throws(() => {
       stmts.insertAgent.run(
-        "bad-agent", "sess-2", "Test", "main", null, "invalid_status", null, null, null
+        "bad-agent",
+        "sess-2",
+        "Test",
+        "main",
+        null,
+        "invalid_status",
+        null,
+        null,
+        null
       );
     });
   });
@@ -536,7 +547,15 @@ describe("Database Integrity", () => {
   it("should enforce agent type CHECK constraint", () => {
     assert.throws(() => {
       stmts.insertAgent.run(
-        "bad-agent2", "sess-2", "Test", "invalid_type", null, "idle", null, null, null
+        "bad-agent2",
+        "sess-2",
+        "Test",
+        "invalid_type",
+        null,
+        "idle",
+        null,
+        null,
+        null
       );
     });
   });
@@ -544,7 +563,17 @@ describe("Database Integrity", () => {
   it("should cascade delete agents when session is deleted", () => {
     // Create a session with agents
     stmts.insertSession.run("cascade-test", "Cascade Test", "active", null, null, null);
-    stmts.insertAgent.run("cascade-agent", "cascade-test", "Agent", "main", null, "idle", null, null, null);
+    stmts.insertAgent.run(
+      "cascade-agent",
+      "cascade-test",
+      "Agent",
+      "main",
+      null,
+      "idle",
+      null,
+      null,
+      null
+    );
 
     // Verify agent exists
     assert.ok(stmts.getAgent.get("cascade-agent"));

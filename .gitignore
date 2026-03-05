@@ -7,3 +7,4 @@ client/tsconfig.tsbuildinfo
 *.db-shm
 .env
 .claude/
+.vs/

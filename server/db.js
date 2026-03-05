@@ -55,6 +55,15 @@ db.exec(`
     FOREIGN KEY (agent_id) REFERENCES agents(id) ON DELETE SET NULL
   );
 
+  CREATE TABLE IF NOT EXISTS token_usage (
+    session_id TEXT PRIMARY KEY,
+    input_tokens INTEGER NOT NULL DEFAULT 0,
+    output_tokens INTEGER NOT NULL DEFAULT 0,
+    cache_read_tokens INTEGER NOT NULL DEFAULT 0,
+    cache_write_tokens INTEGER NOT NULL DEFAULT 0,
+    FOREIGN KEY (session_id) REFERENCES sessions(id) ON DELETE CASCADE
+  );
+
   CREATE INDEX IF NOT EXISTS idx_agents_session ON agents(session_id);
   CREATE INDEX IF NOT EXISTS idx_agents_status ON agents(status);
   CREATE INDEX IF NOT EXISTS idx_events_session ON events(session_id);
@@ -97,15 +106,14 @@ const stmts = {
   insertEvent: db.prepare(
     "INSERT INTO events (session_id, agent_id, event_type, tool_name, summary, data, created_at) VALUES (?, ?, ?, ?, ?, ?, datetime('now'))"
   ),
-  listEvents: db.prepare(
-    "SELECT * FROM events ORDER BY created_at DESC, id DESC LIMIT ? OFFSET ?"
-  ),
+  listEvents: db.prepare("SELECT * FROM events ORDER BY created_at DESC, id DESC LIMIT ? OFFSET ?"),
   listEventsBySession: db.prepare(
     "SELECT * FROM events WHERE session_id = ? ORDER BY created_at ASC, id ASC"
   ),
   countEvents: db.prepare("SELECT COUNT(*) as count FROM events"),
-  countEventsSince: db.prepare(
-    "SELECT COUNT(*) as count FROM events WHERE created_at >= ?"
+  countEventsSince: db.prepare("SELECT COUNT(*) as count FROM events WHERE created_at >= ?"),
+  countEventsToday: db.prepare(
+    "SELECT COUNT(*) as count FROM events WHERE created_at >= datetime('now', 'start of day')"
   ),
 
   stats: db.prepare(`
@@ -116,12 +124,66 @@ const stmts = {
       (SELECT COUNT(*) FROM agents) as total_agents,
       (SELECT COUNT(*) FROM events) as total_events
   `),
-  agentStatusCounts: db.prepare(
-    "SELECT status, COUNT(*) as count FROM agents GROUP BY status"
-  ),
-  sessionStatusCounts: db.prepare(
-    "SELECT status, COUNT(*) as count FROM sessions GROUP BY status"
-  ),
+  agentStatusCounts: db.prepare("SELECT status, COUNT(*) as count FROM agents GROUP BY status"),
+  sessionStatusCounts: db.prepare("SELECT status, COUNT(*) as count FROM sessions GROUP BY status"),
+
+  upsertTokenUsage: db.prepare(`
+    INSERT INTO token_usage (session_id, input_tokens, output_tokens, cache_read_tokens, cache_write_tokens)
+    VALUES (?, ?, ?, ?, ?)
+    ON CONFLICT(session_id) DO UPDATE SET
+      input_tokens = input_tokens + excluded.input_tokens,
+      output_tokens = output_tokens + excluded.output_tokens,
+      cache_read_tokens = cache_read_tokens + excluded.cache_read_tokens,
+      cache_write_tokens = cache_write_tokens + excluded.cache_write_tokens
+  `),
+  getTokenTotals: db.prepare(`
+    SELECT
+      COALESCE(SUM(input_tokens), 0) as total_input,
+      COALESCE(SUM(output_tokens), 0) as total_output,
+      COALESCE(SUM(cache_read_tokens), 0) as total_cache_read,
+      COALESCE(SUM(cache_write_tokens), 0) as total_cache_write
+    FROM token_usage
+  `),
+  toolUsageCounts: db.prepare(`
+    SELECT tool_name, COUNT(*) as count
+    FROM events
+    WHERE tool_name IS NOT NULL
+    GROUP BY tool_name
+    ORDER BY count DESC
+    LIMIT 20
+  `),
+  dailyEventCounts: db.prepare(`
+    SELECT DATE(created_at) as date, COUNT(*) as count
+    FROM events
+    WHERE created_at >= DATE('now', '-365 days')
+    GROUP BY DATE(created_at)
+    ORDER BY date ASC
+  `),
+  dailySessionCounts: db.prepare(`
+    SELECT DATE(started_at) as date, COUNT(*) as count
+    FROM sessions
+    WHERE started_at >= DATE('now', '-365 days')
+    GROUP BY DATE(started_at)
+    ORDER BY date ASC
+  `),
+  agentTypeDistribution: db.prepare(`
+    SELECT subagent_type, COUNT(*) as count
+    FROM agents
+    WHERE type = 'subagent' AND subagent_type IS NOT NULL
+    GROUP BY subagent_type
+    ORDER BY count DESC
+  `),
+  totalSubagentCount: db.prepare("SELECT COUNT(*) as count FROM agents WHERE type = 'subagent'"),
+  eventTypeCounts: db.prepare(`
+    SELECT event_type, COUNT(*) as count
+    FROM events
+    GROUP BY event_type
+    ORDER BY count DESC
+  `),
+  avgEventsPerSession: db.prepare(`
+    SELECT ROUND(CAST(COUNT(*) AS REAL) / MAX(1, (SELECT COUNT(*) FROM sessions)), 1) as avg
+    FROM events
+  `),
 };
 
 module.exports = { db, stmts, DB_PATH };

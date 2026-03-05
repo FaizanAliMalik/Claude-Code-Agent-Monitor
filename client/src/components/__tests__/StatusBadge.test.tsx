@@ -47,17 +47,13 @@ describe("AgentStatusBadge", () => {
   });
 
   it("should respect explicit pulse=false override", () => {
-    const { container } = render(
-      <AgentStatusBadge status="working" pulse={false} />
-    );
+    const { container } = render(<AgentStatusBadge status="working" pulse={false} />);
     const dot = container.querySelector(".animate-pulse-dot");
     expect(dot).not.toBeInTheDocument();
   });
 
   it("should respect explicit pulse=true override", () => {
-    const { container } = render(
-      <AgentStatusBadge status="idle" pulse={true} />
-    );
+    const { container } = render(<AgentStatusBadge status="idle" pulse={true} />);
     const dot = container.querySelector(".animate-pulse-dot");
     expect(dot).toBeInTheDocument();
   });
